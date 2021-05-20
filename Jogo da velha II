@@ -4,7 +4,6 @@ import java.util.*;
  * Title:        Jogo da Velha
  * Description:  Implementação simples do jogo da velha para dois jogadores com
  * interface pelo teclado.
- * Copyright:    Copyright (c) 2001
  * Company:
  * @version 1.0
  */
