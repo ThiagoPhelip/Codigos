@@ -1,0 +1,254 @@
+import java.io.*;
+import java.util.*;
+/**
+ * Title:        Jogo da Velha
+ * Description:  Implementação simples do jogo da velha para dois jogadores com
+ * interface pelo teclado.
+ * Copyright:    Copyright (c) 2001
+ * Company:
+ * @version 1.0
+ */
+class Leitura {
+      /** Método para leitura de int.
+     * @param Nenhum.
+     * @return O primeiro int lido com sucesso da entrada padrão.
+     */
+    private static void error(String tipo){
+      	System.err.println("LeituraJogoDeTrilha: Erro ao tentar ler "+tipo+"."+
+			   " Por favor redigite.");
+    }
+    public static int leInt()
+    {	do  try{ return(Integer.parseInt((new DataInputStream(System.in)).readLine())); }
+	    catch(Exception e){ error("int"); }
+	while(true);
+    }
+}
+
+class Tabuleiro {
+    char [] tab = new char[9];
+    int ocup =0; // numero de posiçoes ocupadas
+    public Tabuleiro(){ // Construtor
+    for(int i=0;i<9;i++)
+      tab[i]=' ';
+    ocup=0;
+  }
+    public char escolhePeca(){
+	Random a = new Random(); 
+	if (a.nextInt(2)>=1)
+	    return 'X';
+	return 'O';
+    }
+
+    public char pecaAdversario(char ch){
+	if (ch=='X')
+	    return 'O';
+	return 'X';
+    }
+	
+  public void imprimeTabuleiro(){
+    System.out.println("Situacao atual");
+    System.out.println(tab[0]+"|"+tab[1]+"|"+tab[2]);
+    System.out.println("-----");
+    System.out.println(tab[3]+"|"+tab[4]+"|"+tab[5]);
+    System.out.println("-----");
+    System.out.println(tab[6]+"|"+tab[7]+"|"+tab[8]);
+    System.out.println();
+  }
+  public boolean jogadaValida(int i, char ch){
+    if ((i<0)||(i>8)||(tab[i]!=' '))
+      return false; // jogada invalida
+    else {
+      tab[i]=ch;
+      ocup++;
+    }
+    return true;
+  }
+  public void voltaJogada(int i){
+      tab[i]=' ';// limpa a posição i
+      ocup--;
+  }
+  public char quemGanhou(){
+    if ((tab[0]=='X')&&(tab[1]=='X')&&(tab[2]=='X')||
+        (tab[3]=='X')&&(tab[4]=='X')&&(tab[5]=='X')|| // linhas
+	(tab[6]=='X')&&(tab[7]=='X')&&(tab[8]=='X')||
+	(tab[0]=='X')&&(tab[3]=='X')&&(tab[6]=='X')||
+        (tab[1]=='X')&&(tab[4]=='X')&&(tab[7]=='X')|| // colunas
+	(tab[2]=='X')&&(tab[5]=='X')&&(tab[8]=='X')||
+	(tab[0]=='X')&&(tab[4]=='X')&&(tab[8]=='X')|| //diagonais
+	(tab[6]=='X')&&(tab[4]=='X')&&(tab[2]=='X'))
+	return 'X';
+    if ((tab[0]=='O')&&(tab[1]=='O')&&(tab[2]=='O')||
+        (tab[3]=='O')&&(tab[4]=='O')&&(tab[5]=='O')|| // linhas
+	(tab[6]=='O')&&(tab[7]=='O')&&(tab[8]=='O')||
+	(tab[0]=='O')&&(tab[3]=='O')&&(tab[6]=='O')||
+        (tab[1]=='O')&&(tab[4]=='O')&&(tab[7]=='O')||// colunas
+	(tab[2]=='O')&&(tab[5]=='O')&&(tab[8]=='O')||
+	(tab[0]=='O')&&(tab[4]=='O')&&(tab[8]=='O')|| //diagonais
+	(tab[6]=='O')&&(tab[4]=='O')&&(tab[2]=='O'))
+	return 'O';
+    return ' ';
+  }
+  public boolean finalJogo(){
+    if (ocup==9) // tabuleiro todo ocupado
+      return true;
+    if (quemGanhou()!=' ') // alguem ganhou
+      return true;
+    return false;
+  }
+}
+interface Jogador{
+    public void efetuaJogada(Tabuleiro t);
+}
+
+class Humano implements Jogador{
+  char tipo;
+  public Humano(char ch){ //construtor
+    tipo = ch;
+  }
+  public void efetuaJogada(Tabuleiro t){
+    int num;
+    System.out.println("Caro jogador: "+tipo+" entre com um numero entre 0 e 8");
+    num=Leitura.leInt();
+    while(!t.jogadaValida(num, tipo)){
+	System.out.println("Por favor tente novamente");
+	num=Leitura.leInt();
+    }
+  }
+}
+
+class Computador implements Jogador{
+    char tipo;
+    public Computador(char ch){ // construtor
+	tipo = ch;
+    }
+    private int evalC(Tabuleiro t){
+	int melhor=-101, jogada, aux;
+	for(int i=0;i<9;i++){
+	    if (t.jogadaValida(i, tipo)){ // se a jogada for válida
+		if (t.finalJogo()){
+		    if (t.quemGanhou()==tipo)
+			melhor= 100; // valor alto
+		    else // empate
+			melhor=0;
+		}
+		t.voltaJogada(i); // volta o tabuleiro a forma anterior
+	    }
+	}
+	if (melhor>-101) // posso ganhar ou empatar
+	    return melhor;
+	else {
+	    for(int i=0;i<9;i++){
+		if (t.jogadaValida(i, tipo)){ // se a jogada for válida
+		    aux = evalH(t); // avalia a jogada do computador
+		    if (aux>melhor){ // se esta jogada for boa
+			melhor=aux;
+			jogada=i;
+		    }
+		    t.voltaJogada(i); // volta o tabuleiro a forma anterior
+		}
+	    }
+	    return melhor;
+	}
+    }
+    private int evalH(Tabuleiro t){
+	int pior=101, jogada, aux;
+	char outro; // peca do outro jogador
+	outro = t.pecaAdversario(tipo);
+	for(int i=0;i<9;i++){
+	    if (t.jogadaValida(i, outro)){ // se a jogada for válida
+		if (t.finalJogo()){
+		    if (t.quemGanhou()==outro)
+			pior= -100; // valor baixo
+		    else //empate
+			pior=0;     // se ele não pode ganhar, empata
+		}
+		t.voltaJogada(i); // volta o tabuleiro a forma anterior
+	    }
+	}
+	if (pior<101) // o outro pode ganhar ou empatar
+	    return pior;
+	else {
+	    for(int i=0;i<9;i++){
+		if (t.jogadaValida(i, outro)){ // se a jogada for válida
+		    aux = evalC(t); // avalia a jogada do humano
+		    if (aux<pior){ // se esta jogada for boa
+			pior=aux;
+			jogada=i;
+		    }
+		    t.voltaJogada(i); // volta o tabuleiro a forma anterior
+		}
+	    }
+	    return pior;
+	}
+    }
+		
+    public void efetuaJogada(Tabuleiro t){
+	int  aux,
+	    jogada = -1, // começa com uma melhor jogada inválida
+	    melhor = -101; // o valor dela é bem baixo (-infinito)
+	Random a = new Random();
+	// primeiro verifico se posso ganhar
+	for(int i=0; i<9; i++){
+	    if (t.jogadaValida(i, tipo)){ // se a jogada for válida
+		if (t.finalJogo()) // ganhei ou empatei
+		    return; // força a saída do método
+		t.voltaJogada(i); // volta o tabuleiro a forma anterior
+	    }
+	}
+	// se cheguei até aqui vou fazer a recursão
+	for(int i=0; i<9; i++){
+	    if (t.jogadaValida(i, tipo)){ // se a jogada for válida
+		aux = evalH(t);
+		if (aux>melhor){ // se a jogada i for melhor
+		    melhor=aux; 
+		    jogada=i;
+		}
+		else if (aux==melhor){ // se for igual coloca aleatoriedade
+		    if (a.nextInt(2)==1){
+			melhor=aux;  // desta forma o computador "escolhe"
+			jogada=i;    // entre jogadas equivalente
+		    }
+		}
+		t.voltaJogada(i); // retira a peça recem colocada
+	    }
+	}
+	t.jogadaValida(jogada, tipo);
+    }
+}
+public class Principal {
+  public static void main(String[] args) {
+    Tabuleiro t = new Tabuleiro();
+    Jogador j1,j2;
+    char ch=t.escolhePeca();
+    j1 = new Humano(ch);
+    j2 = new Computador(t.pecaAdversario(ch));
+    Jogador atual;
+    System.out.println("Jogo da Velha contra o Computador");
+    System.out.println("O jogador que estiver com o X começa");
+    System.out.println("no sorteio voce ficou com o "+ch);
+    System.out.println("Escolha uma coordenada conforme a tabela abaixo");
+    System.out.println("0|1|2");
+    System.out.println("-----");
+    System.out.println("3|4|5");
+    System.out.println("-----");
+    System.out.println("6|7|8");
+    System.out.println("");
+    if (ch=='X') // começa jogando o jogador com o X
+	atual = j1;
+    else
+	atual = j2;
+    while (!t.finalJogo()){
+      atual.efetuaJogada(t);
+      t.imprimeTabuleiro();
+      if (atual==j1) // agora eh a vez do j2
+	atual=j2;
+      else
+	atual=j1;
+    }
+    t.imprimeTabuleiro();
+    if (t.quemGanhou()==' ')
+      System.out.println("Empate");
+    else
+      System.out.println("Ganhou o jogador com: "+t.quemGanhou());
+  }
+}
