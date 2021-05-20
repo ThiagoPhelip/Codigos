@@ -1,0 +1,556 @@
+package JogodaVelha;
+
+import javax.swing.JFrame;
+
+public class Janela {	
+
+	public static void main(String[] args){	
+
+		JFrame frame = new JFrame("Tic Tae Toe");
+
+		frame.setSize(600, 630);
+
+		frame.setLocationRelativeTo(null);
+
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		frame.setVisible(true);
+
+		frame.setResizable(false);
+
+		
+
+		Tabuleiro velha = new Tabuleiro();
+
+		velha.setBounds(0, 0, 600, 600);
+
+		frame.add(velha);
+
+		
+
+		frame.addMouseListener(velha);
+
+	}
+
+	
+
+}
+
+
+
+(Aba Jogo da Velha)
+
+package JogodaVelha;
+
+
+
+import java.awt.BasicStroke;
+
+import java.awt.Color;
+
+import java.awt.Font;
+
+import java.awt.Graphics;
+
+import java.awt.Graphics2D;
+
+import java.awt.event.MouseEvent;
+
+import java.awt.event.MouseListener;
+
+
+
+import javax.swing.JOptionPane;
+
+import javax.swing.JPanel;
+
+
+
+public class Tabuleiro extends JPanel implements MouseListener {
+
+	Font minhaFontGrand = new Font("Consolas", Font.BOLD, 80);
+
+	Font minhaFontMedia = new Font("Consolas", Font.BOLD, 30);
+
+	Font minhaFontPeq = new Font("Consolas", Font.BOLD, 15);
+
+	
+
+	int matriz[][];
+
+	int jogador;
+
+	int ganhador;
+
+	boolean jogarNov;
+
+	
+
+	int v1; 
+
+	int v2;
+
+	int empates;
+
+	 
+
+	Color cor1;
+
+	
+
+	public Tabuleiro() {
+
+		
+
+		matriz = new int[3][3];	
+
+		jogador = 1;
+
+		ganhador = 0;
+
+		jogarNov = false;
+
+		cor1 = new Color(0, 160, 0);
+
+		v1 = 0;
+
+		v2 = 0;
+
+		empates = 0;
+
+		
+
+		for(int lin = 0; lin < 3; lin++) {
+
+			
+
+			for(int col = 0; col < 3; col++) {
+
+				System.out.print(matriz[lin][col]);
+
+			}
+
+			System.out.println();
+
+		}
+
+
+
+	}
+
+	
+
+	@Override
+
+	public void paintComponent(Graphics g2) {
+
+		
+
+		Graphics2D g = (Graphics2D) g2.create();
+
+		
+
+		System.out.println();
+
+		for(int lin = 0; lin < 3; lin++) {
+
+			
+
+			for(int col = 0; col < 3; col++) {
+
+				System.out.print(matriz[lin][col]);
+
+			}
+
+			System.out.println();
+
+		}
+
+		
+
+		if (jogarNov) {
+
+			new JOptionPane();
+
+			int jogarNovamente = JOptionPane.showConfirmDialog(this, "Deseja jogar novamente?");
+
+			
+
+			if (jogarNovamente == JOptionPane.OK_OPTION) {
+
+				jogarNov = false;
+
+				reiniciarJogo();
+
+			} else {
+
+				System.exit(1);
+
+			}
+
+		}
+
+		
+
+		g.setStroke(new BasicStroke(5)); //deixar a linha mais grossa
+
+		g.setFont(minhaFontGrand); //configurar fonte
+
+				
+
+		g.setColor(Color.white);
+
+		g.fillRect(0, 0, 600, 600);
+
+				
+
+		g.setColor(Color.blue);
+
+		g.drawLine(0, 200, 600, 200);
+
+		g.drawLine(0, 400, 600, 400);
+
+		
+
+		g.drawLine(200, 0, 200, 600);
+
+		g.drawLine(400, 0, 400, 600);
+
+		
+
+		for(int lin = 0; lin < 3; lin++) {
+
+			
+
+			for(int col = 0; col < 3; col++) {
+
+		
+
+				if (matriz[lin][col] == 1) {
+
+					g.setColor(cor1);
+
+					g.drawString("o", 75 + col * 200, 125 + lin * 200);
+
+				} else if (matriz[lin][col] == 2) {
+
+					g.setColor(Color.RED);
+
+					g.drawString("x", 75 + col * 200, 125 + lin * 200);
+
+			}
+
+		}
+
+		
+
+	}
+
+	
+
+		if (ganhador != 0) {
+
+			g.setFont(minhaFontMedia);
+
+			
+
+			if(ganhador == 3) {
+
+				g.setColor(Color.black);
+
+				g.drawString("O jogo empatou", 180, 180);
+
+				
+
+			} else {
+
+			
+
+				if (ganhador == 1)
+
+					g.setColor(cor1);
+
+				else if (ganhador == 2)
+
+					g.setColor(Color.red);
+
+			
+
+			
+
+				g.setFont(minhaFontMedia);
+
+				g.drawString("O jogador" + ganhador + "venceu", 150, 200);
+
+			
+
+			}
+
+			
+
+			jogarNov = true;
+
+			repaint();
+
+		}
+
+		
+
+		g.setFont(minhaFontPeq);
+
+		
+
+		g.setColor(cor1);
+
+		g.drawString("Vitórias: " + v1, 60, 20);
+
+		
+
+		g.setColor(Color.red);
+
+		g.drawString("Vitórias: " + v2, 460, 20);
+
+		
+
+		g.setColor(Color.black);
+
+		g.drawString("Empates: " + empates, 260, 20);
+
+	}
+
+
+
+	@Override
+
+	public void mouseClicked(MouseEvent e) {
+
+		
+
+		//System.out.println(e.getX() + ", " + e.getY());
+
+	
+
+		int linha = e.getY() / 200;
+
+		int coluna = e.getX() / 200;
+
+		if (linha ==3) {
+
+			linha = 2;
+
+		} 
+
+		if (coluna ==3) {
+
+			coluna = 2;
+
+		}
+
+		System.out.println("Clicou na linha: " + linha);
+
+		System.out.println("Clicou na coluna: " + coluna);
+
+		
+
+		if (jogador == 1 && matriz [linha][coluna] == 0) {		
+
+			matriz[linha][coluna] = 1;
+
+			jogador = 2;
+
+		} else if (jogador == 2 && matriz [linha][coluna] == 0) {
+
+			matriz[linha][coluna] = 2;
+
+			jogador = 1;
+
+		}
+
+		
+
+		verificaGanhador();
+
+		
+
+		repaint();
+
+	}
+
+	
+
+	
+
+	private void reiniciarJogo() {
+
+		
+
+		for(int lin = 0; lin < 3; lin++) {
+
+			
+
+			for(int col = 0; col < 3; col++) {
+
+				matriz[lin][col] = 0;
+
+				ganhador = 0;
+
+			}
+
+		}
+
+	
+
+	}
+
+	
+
+		
+
+	private void verificaGanhador() {
+
+		
+
+		//verifica as linhas
+
+		for(int lin = 0; lin < 3; lin++) {
+
+			if (matriz[lin][0] == matriz[lin][1] && matriz [lin][0] == matriz[lin][2] && matriz [lin][0] != 0) {
+
+				System.out.println("Houve ganahdor");
+
+				ganhador = matriz[lin][0];
+
+				break;
+
+			}
+
+		}
+
+	
+
+		//verifica as colunas
+
+		for(int col = 0; col < 3; col++) {
+
+			if (matriz[0][col] == matriz[1][col] && matriz [0][col] == matriz[2][col] && matriz [0][col] != 0) {
+
+				System.out.println("Houve ganahdor");
+
+				ganhador = matriz[0][col];
+
+				break;
+
+			}
+
+		}
+
+		//verifica as diagonal principal
+
+		if (matriz[0][0] == matriz [1][1] && matriz[0][0] == matriz [2][2]&& matriz [0][0] != 0) {
+
+				System.out.println("Houve ganahdor");
+
+				ganhador = matriz[0][0];
+
+		}
+
+		
+
+		//verifica a diagonal secundária
+
+		if (matriz[0][2] == matriz [1][1] && matriz[0][2] == matriz [2][0]&& matriz [0][2] != 0) {
+
+				System.out.println("Houve ganahdor");
+
+				ganhador = matriz[0][2];
+
+		}
+
+	
+
+	
+
+		if (ganhador == 1) {
+
+			v1++; 
+
+		} else if (ganhador == 2) {
+
+			v2++;
+
+		} else {
+
+			
+
+			boolean cheia = true;
+
+			for(int lin = 0; lin < 3; lin++) {
+
+				
+
+				for(int col = 0; col < 3; col++) {
+
+					if(matriz[lin][col] == 0)
+
+						cheia = false;
+
+				}
+
+			}
+
+	
+
+			if (cheia) {
+
+				ganhador = 3;
+
+				empates++;
+
+			}
+
+		}
+
+	}
+
+		
+
+	@Override
+
+	public void mouseEntered(MouseEvent e) {
+
+
+
+	}
+
+
+
+	@Override
+
+	public void mouseExited(MouseEvent e) {
+
+
+
+	}
+
+
+
+	@Override
+
+	public void mousePressed(MouseEvent e) {
+
+		
+
+	}
+
+
+
+	@Override
+
+	public void mouseReleased(MouseEvent e) {
+
+		
+
+	}
+
+}
+
