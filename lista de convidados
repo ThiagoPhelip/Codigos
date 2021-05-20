@@ -1,0 +1,13 @@
+numero = int(input("Digite a quantidade de pessoas convidades para a festa."))
+i = 1
+lista = []
+
+for i in range (numero):
+#while i <= numero: 
+    convidado = input("Digite o nome do convidado {0}: ". format(i+1))
+    lista.append (convidado)
+    i+=1
+print(" Serão convidados", numero, "pessoas.")
+print("A lista de nomes é: ")
+for convidado in lista:
+    print(convidado)
