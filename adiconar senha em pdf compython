@@ -1,0 +1,21 @@
+# pip install pypdf2
+
+from PyPDF2 import PdfFileWriter, PdffileReader
+import sys
+
+def securepdf(file,password):
+    parse = PdfFileWriter()
+    pdf = PdffileReader(file)
+    for page in range(pdf.numPage):
+        parse.addPage(pdf.getpage(page))
+    parse.encrypt(password)              
+    with open(f"secure_{file}", "wb") as f:
+        parse.write(f)
+        f.close()
+    print(f"secure_{file} Created..." )
+
+
+if name == "main":
+    file = sys.argv[1]
+    password = sys.argv[2]
+    securepdf(file,password)
