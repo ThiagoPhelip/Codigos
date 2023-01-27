@@ -27,3 +27,7 @@ for face in faces:
         print("Reconhecido como: " + name)
     else:
         print("Não reconhecido")
+
+        
+        # Para fazer reconhecimento facial em Python, você pode usar bibliotecas como OpenCV e dlib. Aqui está um exemplo de como usar essas bibliotecas para detectar e reconhecer rostos em uma imagem:
+        #Observe que este exemplo é apenas uma ilustração geral e pode precisar de ajustes e adaptações para funcionar com sua aplicação específica.
